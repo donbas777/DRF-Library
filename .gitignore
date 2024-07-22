@@ -5,3 +5,8 @@ users/__pycache__/
 borrowings/__pycache__/
 books/__pycache__/
 payments/__pycache__/
+Library_service/__pycache__/
+users/migrations/__pycache__/
+borrowings/migrations/__pycache__/
+books/migrations/__pycache__/
+payments/migrations/__pycache__/
