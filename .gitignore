@@ -1,6 +1,7 @@
 venv
 .idea
 db.sqlite3
+__pycache__/
 users/__pycache__/
 borrowings/__pycache__/
 books/__pycache__/
@@ -10,3 +11,4 @@ users/migrations/__pycache__/
 borrowings/migrations/__pycache__/
 books/migrations/__pycache__/
 payments/migrations/__pycache__/
+.env
