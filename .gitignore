@@ -10,3 +10,4 @@ users/migrations/__pycache__/
 borrowings/migrations/__pycache__/
 books/migrations/__pycache__/
 payments/migrations/__pycache__/
+.env
