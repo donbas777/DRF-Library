@@ -10,11 +10,17 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import sys
+import dj_database_url
+
 from pathlib import Path
 from datetime import timedelta
+from decouple import config
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+SECRET_KEY = config("DJANGO_SECRET_KEY")
 
 
 # Quick-start development settings - unsuitable for production
@@ -112,12 +118,9 @@ WSGI_APPLICATION = 'Library_service.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+DATABASE_URL = config("DATABASE_URL", default="sqlite:///db.sqlite3")
+
+DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=600)}
 
 
 # Password validation
@@ -166,3 +169,37 @@ MEDIA_URL = "/media/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+STRIPE_PUBLISHABLE_KEY = config("STRIPE_PUBLISHABLE_KEY")
+STRIPE_SECRET_KEY = config("STRIPE_SECRET_KEY")
+
+CELERY_BROKER_URL = "redis://redis:6379/0"
+CELERY_RESULT_BACKEND = "redis://redis:6379/0"
+
+CELERY_BEAT_SCHEDULE = {
+    "expired_payment_sessions_task": {
+        "task": "payment.tasks.check_stripe_sessions",
+        "schedule": crontab(minute="*/1")
+    },
+    "borrowing_expired_task": {
+        "task": "borrowing.tasks.get_borrowing_report",
+        "schedule": crontab(hour=15, minute=0)
+    },
+    "daily_payment_report_task": {
+        "task": "payment.tasks.daily_payment_report",
+        "schedule": crontab(hour=19, minute=0)
+    },
+    "monthly_payment_report_task": {
+        "task": "payment.tasks.monthly_payment_report",
+        "schedule": crontab(hour=9, minute=0, day_of_month=1)
+    }
+}
+
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+]
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
